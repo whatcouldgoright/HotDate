@@ -10,23 +10,25 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class PublicHolidaysController : ControllerBase
+    public class HolidaysController : ControllerBase
     {
         private readonly ILogger<BusinessDaysController> _logger;
         private readonly IHolidayService _holidaysService;
+        private readonly ICalendarService _calendarService;
 
-        public PublicHolidaysController(ILogger<BusinessDaysController> logger,
-                                       IHolidayService holidaysService)
+        public HolidaysController(ILogger<BusinessDaysController> logger,
+                                  ICalendarService calendarService)
         {
             _logger = logger;
-            _holidaysService = holidaysService;
+            _calendarService = calendarService;
         }
 
         [HttpGet]
-        public IEnumerable<PublicHoliday> GetHolidays()
+        public List<DateTime> Get([FromQuery] int year)
         {
-            return _holidaysService.GetPublicHolidays();
+            return _calendarService.GetHolidayDates(year);
         }
+
     }
 }
  

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Hotdate.Services.Rules.Holidays;
 
 namespace HotDate.Services
 {
@@ -11,6 +8,7 @@ namespace HotDate.Services
         /*
          * Fetches whole business days between two dates, exclusive of start and end date.
          */
-        public int GetBusinessDaysBetweenDates(DateTime fromDate, DateTime toDate);
+        int GetBusinessDaysBetweenDates(DateTime fromDate, DateTime toDate);
+        List<DateTime> GetHolidayDates(int year);
     }
 }

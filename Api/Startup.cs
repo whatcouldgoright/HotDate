@@ -21,7 +21,11 @@ namespace Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<ICalendarService, CalendarService>();
-            services.AddScoped<IHolidayService, HolidayService>();
+
+            services.AddSingleton<IHolidayService, HolidayService>();
+            services.AddSingleton<IHolidayService, FixedHolidayService>();
+            services.AddSingleton<IHolidayService, RuleHolidayService>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
