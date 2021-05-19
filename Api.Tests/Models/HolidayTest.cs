@@ -7,16 +7,18 @@ namespace Api.Services.Tests
     public class HolidayTest
     {
         [Theory]
-        [InlineData(2021, 01, 26, "2021-01-26")]   // anzac day
-        // HS: TODO: Implement rollover test.
-        public void GetEffectiveDate(int year, int month, int date, string expectedResultString)
+        [InlineData(2021, 01, 26, false, "2021-01-26")]   // anzac day
+        [InlineData(2021, 12, 25, true, "2021-12-27")]   // Xmas day
+        //[InlineData(2021, 01, 26, true, "2021-01-26")]   // HS: TODO:  Boxing Day: Dobule Rollover!
+        public void GetEffectiveDate(int year, int month, int date, bool rollover, string expectedResultString)
         {
             DateTime expectedEffectiveDate = DateTime.Parse(expectedResultString);
 
             Holiday holiday = new Holiday {
                 Name = "foo",
                 Month = month,
-                Date = date
+                Date = date,
+                Rollover = rollover
             };
 
             Assert.Equal(expectedEffectiveDate, holiday.EffectiveDate(year));
