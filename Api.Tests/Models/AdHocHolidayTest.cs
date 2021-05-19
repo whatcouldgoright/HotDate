@@ -4,7 +4,7 @@ using HotDate.Model;
 
 namespace Api.Services.Tests
 {
-    public class FixedHolidayTest
+    public class AdHocHolidayTest
     {
         [Theory]
         [InlineData(2021, 09, 25, "2021-09-25")]   // afl grand final 2021
@@ -12,7 +12,7 @@ namespace Api.Services.Tests
         {
             DateTime expectedEffectiveDate = DateTime.Parse(expectedResultString);
 
-            FixedHoliday holiday = new FixedHoliday {
+            AdHocHoliday holiday = new AdHocHoliday {
                 Name = "foo",
                 Year = year,
                 Month = month,

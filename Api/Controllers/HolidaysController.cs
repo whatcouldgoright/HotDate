@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using HotDate.Model;
 using HotDate.Services;
 
 namespace Api.Controllers
@@ -13,20 +12,27 @@ namespace Api.Controllers
     public class HolidaysController : ControllerBase
     {
         private readonly ILogger<BusinessDaysController> _logger;
-        private readonly IHolidayService _holidaysService;
-        private readonly ICalendarService _calendarService;
+        private readonly IAdhocHolidayService _adhocHolidayService;
 
         public HolidaysController(ILogger<BusinessDaysController> logger,
-                                  ICalendarService calendarService)
+                                  IAdhocHolidayService adhocHolidayService)
         {
             _logger = logger;
-            _calendarService = calendarService;
+            _adhocHolidayService = adhocHolidayService;
         }
 
         [HttpGet]
-        public List<DateTime> Get([FromQuery] int year)
+        [Route("Adhoc")]
+        public IEnumerable<AdHocHoliday> Get([FromQuery] int year)
         {
-            return _calendarService.GetHolidayDates(year);
+            return _adhocHolidayService.GetHolidays();
+        }
+
+        [HttpPost]
+        [Route("Adhoc")]
+        public AdHocHoliday Post([FromBody] AdHocHoliday holiday)
+        {
+            return _adhocHolidayService.SaveHoliday(holiday);
         }
 
     }

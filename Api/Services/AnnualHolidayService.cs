@@ -5,11 +5,11 @@ using HotDate.Model;
 
 namespace HotDate.Services
 {
-    public class HolidayService : IHolidayService
+    public class AnnualHolidayService : IHolidayService
     {
-        private readonly IEnumerable<Holiday> _holidays;
+        private readonly IEnumerable<AnnualHoliday> _holidays;
 
-        public HolidayService() {
+        public AnnualHolidayService() {
             _holidays = LoadHolidays();
         }
 
@@ -24,11 +24,11 @@ namespace HotDate.Services
             return _holidays;
         }
 
-        private IEnumerable<Holiday> LoadHolidays() {
+        private IEnumerable<AnnualHoliday> LoadHolidays() {
 
-            List<Holiday> holidays = new List<Holiday>();
-            holidays.Add(new Holiday { Name= "New Years Day", Month = 1, Date = 1} );
-            holidays.Add(new Holiday { Name= "Australia Day", Month = 1, Date = 26} );
+            List<AnnualHoliday> holidays = new List<AnnualHoliday>();
+            holidays.Add(new AnnualHoliday { Name= "New Years Day", Month = 1, Date = 1, Rollover = true } );
+            holidays.Add(new AnnualHoliday { Name= "Australia Day", Month = 1, Date = 26} );
             return holidays;
         }
 

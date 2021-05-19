@@ -1,13 +1,19 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace HotDate.Model
 {
-    public class Holiday : IHoliday {
+    public class AnnualHoliday : IHoliday {
         
-        public string Name { get; set; }        
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        [Range(1, 12)]
         public int Month { get; set; }
+        [Required]
+        [Range(1, 31)]
         public int Date { get; set; }
-        public bool Rollover { get; set; }
+        public bool Rollover { get; set; } = false;
 
         public virtual DateTime EffectiveDate(int year)
         {

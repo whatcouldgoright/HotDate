@@ -4,7 +4,7 @@ using HotDate.Model;
 
 namespace Api.Services.Tests
 {
-    public class HolidayTest
+    public class AnnualHolidayTest
     {
         [Theory]
         [InlineData(2021, 01, 26, false, "2021-01-26")]   // anzac day
@@ -14,7 +14,7 @@ namespace Api.Services.Tests
         {
             DateTime expectedEffectiveDate = DateTime.Parse(expectedResultString);
 
-            Holiday holiday = new Holiday {
+            AnnualHoliday holiday = new AnnualHoliday {
                 Name = "foo",
                 Month = month,
                 Date = date,

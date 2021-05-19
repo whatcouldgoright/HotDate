@@ -1,10 +1,15 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace HotDate.Model
 {
-    public class RuleHoliday : Holiday {
+    public class RuleHoliday : AnnualHoliday {
 
+        [Required]
+        [Range(0,6)]
         public int DayOfWeek { get; set;}
+        [Required]
+        [Range(1, 4)]
         public int Occurence { get; set;}
 
         public override DateTime EffectiveDate(int year)

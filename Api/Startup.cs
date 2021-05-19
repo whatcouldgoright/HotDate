@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using HotDate.Services;
+using HotDate.Storage;
 
 namespace Api
 {
@@ -22,9 +23,14 @@ namespace Api
         {
             services.AddScoped<ICalendarService, CalendarService>();
 
-            services.AddSingleton<IHolidayService, HolidayService>();
-            services.AddSingleton<IHolidayService, FixedHolidayService>();
-            services.AddSingleton<IHolidayService, RuleHolidayService>();
+            services.AddScoped<IHolidayService, AnnualHolidayService>();
+            services.AddScoped<IHolidayService, RuleHolidayService>();
+            services.AddScoped<IHolidayService, AdHocHolidayService>();
+
+            services.AddScoped<IAdhocHolidayService, AdHocHolidayService>();
+
+            // wants to be Entity Framework when it grows up.
+            services.AddSingleton<IStorage, Storage>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
