@@ -4,16 +4,15 @@ using HotDate.Model;
 
 namespace Api.Services.Tests
 {
-    public class AnnualHolidayTest
+    public class BoxingDayHolidayTest
     {
         [Theory]
-        [InlineData(2021, 01, 26, false, "2021-01-26")]   // anzac day
-        [InlineData(2021, 12, 25, true, "2021-12-27")]   // Xmas day
+        [InlineData(2021, 12, 26, true, "2021-12-28")]   // Boxing Day: Double Rollover!
         public void GetEffectiveDate(int year, int month, int date, bool rollover, string expectedResultString)
         {
             DateTime expectedEffectiveDate = DateTime.Parse(expectedResultString);
 
-            AnnualHoliday holiday = new AnnualHoliday {
+            BoxingDayHoliday holiday = new BoxingDayHoliday {
                 Name = "foo",
                 Month = month,
                 Date = date,

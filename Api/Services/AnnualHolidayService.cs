@@ -29,6 +29,8 @@ namespace HotDate.Services
             List<AnnualHoliday> holidays = new List<AnnualHoliday>();
             holidays.Add(new AnnualHoliday { Name= "New Years Day", Month = 1, Date = 1, Rollover = true } );
             holidays.Add(new AnnualHoliday { Name= "Australia Day", Month = 1, Date = 26} );
+            holidays.Add(new AnnualHoliday { Name= "Christmas Day", Month = 12, Date = 25, Rollover = true } );
+            holidays.Add(new BoxingDayHoliday { Name= "Boxing Day", Month = 12, Date = 26, Rollover = true } );
             return holidays;
         }
 
