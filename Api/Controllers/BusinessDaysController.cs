@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using HotDate.Model;
 using HotDate.Services;
 
 namespace Api.Controllers
@@ -23,14 +21,15 @@ namespace Api.Controllers
         }
 
         [HttpGet]
-        public string Get([FromQuery] string fromDate, [FromQuery] string toDate)
+        
+        public string Get([FromQuery] BusinessDaysQuery businessDaysQuery)
         {
-            DateTime fromDateTime = DateTime.Parse(fromDate);
-            DateTime toDateTime = DateTime.Parse(toDate);
+            DateTime fromDateTime = businessDaysQuery.FromDate;
+            DateTime toDateTime = businessDaysQuery.ToDate;
 
             var result = _calendarService.GetBusinessDaysBetweenDates(fromDateTime, toDateTime);
             
-            return $"There are {result} business days between {fromDate} and {toDate}";
+            return $"There are {result} business days between {fromDateTime.ToShortDateString()} and {toDateTime.ToShortDateString()}";
         }
     }
 }
