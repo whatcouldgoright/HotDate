@@ -8,12 +8,12 @@ namespace Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BusinessDaysController : ControllerBase
+    public class FastBusinessDaysController : ControllerBase
     {
         private readonly ILogger<BusinessDaysController> _logger;
         private readonly ICalendarService _calendarService;
 
-        public BusinessDaysController(ILogger<BusinessDaysController> logger,
+        public FastBusinessDaysController(ILogger<BusinessDaysController> logger,
                                       ICalendarService calendarService)
         {
             _logger = logger;
@@ -27,7 +27,7 @@ namespace Api.Controllers
             DateTime fromDateTime = businessDaysQuery.FromDate;
             DateTime toDateTime = businessDaysQuery.ToDate;
 
-            var result = _calendarService.GetBusinessDaysBetweenDates(fromDateTime, toDateTime);
+            var result = _calendarService.FastBusinessDaysBetweenDates(fromDateTime, toDateTime);
             
             return new BusinessDaysResponse {
                 Count = result

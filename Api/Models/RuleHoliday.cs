@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HotDate.Model
 {
+    /// <summary>Class <c>RuleHoliday</c> represents holidays defined as occurence N of a day after a time,
+    /// for example, 'Second Monday in August'.</summary>
     public class RuleHoliday : AnnualHoliday {
 
         [Required]

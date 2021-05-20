@@ -25,9 +25,7 @@ namespace HotDate.Services
             return holidays.Distinct().Select(h => h.EffectiveDate(year)).Distinct().ToList();
         }
 
-        /*
-         * Fetches whole business days between two dates, exclusive of start and end date.
-         */
+        /// Fetches whole business days between two dates, exclusive of start and end date.  Simple iterator.
         public int GetBusinessDaysBetweenDates(DateTime fromDate, DateTime toDate) {
 
             if(fromDate.CompareTo(toDate) > 0)
@@ -41,24 +39,28 @@ namespace HotDate.Services
             
             var currentDate = fromDate;
             var holidayDates = GetHolidayDates(currentDate.Year);
+            var fetchedHolidayYear = currentDate.Year;
             while(currentDate < toDate)
             {
-                var isHoliday = false;
-                
-                isHoliday = isHoliday || (currentDate.DayOfWeek == DayOfWeek.Saturday || currentDate.DayOfWeek == DayOfWeek.Sunday);
-                isHoliday = isHoliday || holidayDates.Contains(currentDate);
+                if(fetchedHolidayYear != currentDate.Year)
+                    holidayDates = GetHolidayDates(currentDate.Year);
 
-                if(!isHoliday)
+                var isWeekend = (currentDate.DayOfWeek == DayOfWeek.Saturday || currentDate.DayOfWeek == DayOfWeek.Sunday);
+                var isHoliday = holidayDates.Contains(currentDate);
+
+                if(!isWeekend && !isHoliday)
                     businessDays++;
 
-                if(currentDate.AddDays(1).Year > currentDate.Year)
-                    holidayDates = GetHolidayDates(currentDate.Year);
-                    
                 currentDate = currentDate.AddDays(1);
             }
             return businessDays;
         }
 
+        // Process business days faster by:
+        //  - reducing iteration
+        //  - simplifying weekend count to 2 per week, accounting for head and tail
+        //  - assume only non-weekend effective holidays need to be counted, and deduct total
+        // Known issue: finds an extra day compared to "slow" 
         public int FastBusinessDaysBetweenDates(DateTime fromDate, DateTime toDate) {
 
             if(fromDate.CompareTo(toDate) > 0)
@@ -68,26 +70,44 @@ namespace HotDate.Services
 
             fromDate = fromDate.Date.AddDays(1);
             toDate = toDate.Date;
-            
-            var currentDate = fromDate;
+            var businessDays = 0;
 
-            var holidayDates = GetHolidayDates(currentDate.Year).Distinct();
+            // chunk by year to apply holiday rules
+            for(int y = fromDate.Year; y <= toDate.AddDays(-1).Year; y++)
+            {
+                DateTime chunkStart = (y == fromDate.Year) ? fromDate 
+                                                           : new DateTime(y, 1, 1);
+                DateTime chunkEnd = (y == toDate.Year) ? toDate.AddDays(-1)        // don't check to date
+                                                       : new DateTime(y+1, 1, 1);  // but do check last day in chunk
 
-            var start = DateTime.Parse("2021-01-01");
-            var end = DateTime.Parse("2021-12-31");
+                // count business days by week
+                var chunkBusinessDays = 0;
+                var blockDays = (chunkEnd - chunkStart).Days;
+                var weeks = blockDays / 7;
+                var remainder = blockDays % 7;
+                chunkBusinessDays = chunkBusinessDays + (weeks * 5);
 
-            var businessDays = (end - start).Days;
+                // check remainder dates iteratively
+                var tailDate = chunkEnd;
+                while(remainder > 0)
+                {   
+                    if(tailDate.DayOfWeek != DayOfWeek.Saturday && tailDate.DayOfWeek != DayOfWeek.Sunday)
+                        chunkBusinessDays++;
+                    
+                    tailDate = tailDate.AddDays(-1);
+                    remainder --;
+                }
 
-            var weekends = businessDays / 7 * 2;
-            // HS TODO: account for head and tail overruns
-            var weekdayHolidays = holidayDates.Where(h => h.DayOfWeek != DayOfWeek.Saturday && h.DayOfWeek != DayOfWeek.Sunday);
+                // subtract days for any holidays effective on weekdays
+                var chunkHolidays = GetHolidayDates(y).Where(hd => hd >= chunkStart && hd <= chunkEnd)
+                                                      .Where(hd => hd.DayOfWeek != DayOfWeek.Saturday && hd.DayOfWeek != DayOfWeek.Sunday)
+                                                      .Count();
+                chunkBusinessDays = chunkBusinessDays - chunkHolidays;
 
-            businessDays -= weekends;
-            businessDays -= weekdayHolidays.Count();
-
+                businessDays += chunkBusinessDays;
+            }
             return businessDays;
         }
-        
 
     }
 
