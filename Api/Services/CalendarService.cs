@@ -77,7 +77,7 @@ namespace HotDate.Services
             {
                 DateTime chunkStart = (y == fromDate.Year) ? fromDate 
                                                            : new DateTime(y, 1, 1);
-                DateTime chunkEnd = (y == toDate.Year) ? toDate.AddDays(-1)        // don't check to date
+                DateTime chunkEnd = (y == toDate.Year) ? toDate                    // don't check to date
                                                        : new DateTime(y+1, 1, 1);  // but do check last day in chunk
 
                 // count business days by week
