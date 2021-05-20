@@ -35,8 +35,7 @@ namespace Api.Services.Tests
         [InlineData("2020-01-01", "2021-01-01", 261)]   // full year
         [InlineData("2015-01-01", "2021-01-01", 1565)]  // 5 years+
         [InlineData("2020-12-30", "2021-01-01", 1)]     // NYE shenanigans
-        // HS TODO: Test public holiday in count by mocking
-        public void GetBusinessDaysBetweenDates(string start, string end, int expectedResult)
+        public void GetBusinessDaysBetweenDatesAccountsForWeekends(string start, string end, int expectedResult)
         {
             DateTime startDate = DateTime.Parse(start);
             DateTime endDate = DateTime.Parse(end);
@@ -45,8 +44,48 @@ namespace Api.Services.Tests
             var calendarService = new CalendarService(services);
 
             var result = calendarService.GetBusinessDaysBetweenDates(startDate, endDate);
-            Assert.Equal(expectedResult, result);
             var fastResult = calendarService.FastBusinessDaysBetweenDates(startDate, endDate);
+
+            Assert.Equal(expectedResult, result);
+            Assert.Equal(expectedResult, fastResult);
+        }
+
+        [Theory]
+        [InlineData("2021-03-01", "2021-03-05", "", 3)]             // without holiday
+        [InlineData("2021-03-01", "2021-03-05", "2021-03-03", 2)]   // with holiday
+        [InlineData("2021-03-03", "2021-03-10", "2021-03-05", 3)]   // handles weekends and holidays
+        [InlineData("2021-03-03", "2021-03-10", "2021-03-06", 4)]   // doesn't double count holidays if they fall on a weekend
+        public void GetBusinessDaysBetweenDatesAccountsForHolidays(string start, string end, string holidayStr, int expectedResult)
+        {
+            DateTime startDate = DateTime.Parse(start);
+            DateTime endDate = DateTime.Parse(end);
+            
+            List<IHolidayService> services = new List<IHolidayService>();
+            List<IHoliday> holidays = new List<IHoliday>();
+
+            if(!String.IsNullOrWhiteSpace(holidayStr))
+            {
+                DateTime holidayDate = DateTime.Parse(holidayStr);
+                if(!String.IsNullOrWhiteSpace(holidayStr)) {
+                    AdHocHoliday holiday = new AdHocHoliday {
+                        Name = "Foo",
+                        Year = holidayDate.Year,
+                        Month = holidayDate.Month,
+                        Date = holidayDate.Day            
+                    };
+                    holidays.Add(holiday);
+                }
+            }
+            
+            var holidayServiceMock = new Mock<IHolidayService>();
+            holidayServiceMock.Setup(s => s.GetHolidays(It.IsAny<int>())).Returns(holidays);
+            services.Add(holidayServiceMock.Object);
+            var calendarService = new CalendarService(services);
+
+            var result = calendarService.GetBusinessDaysBetweenDates(startDate, endDate);
+            var fastResult = calendarService.FastBusinessDaysBetweenDates(startDate, endDate);
+
+            Assert.Equal(expectedResult, result);
             Assert.Equal(expectedResult, fastResult);
         }
 
