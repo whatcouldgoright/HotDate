@@ -59,8 +59,7 @@ namespace HotDate.Services
         // Process business days faster by:
         //  - reducing iteration
         //  - simplifying weekend count to 2 per week, accounting for head and tail
-        //  - assume only non-weekend effective holidays need to be counted, and deduct total
-        // Known issue: finds an extra day compared to "slow" 
+        //  - assume only non-weekend effective holidays need to be counted, and deduct total 
         public int FastBusinessDaysBetweenDates(DateTime fromDate, DateTime toDate) {
 
             if(fromDate.CompareTo(toDate) > 0)
