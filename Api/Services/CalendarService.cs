@@ -88,7 +88,7 @@ namespace HotDate.Services
                 chunkBusinessDays = chunkBusinessDays + (weeks * 5);
 
                 // check remainder dates iteratively
-                var tailDate = chunkEnd;
+                var tailDate = chunkEnd.AddDays(-1);
                 while(remainder > 0)
                 {   
                     if(tailDate.DayOfWeek != DayOfWeek.Saturday && tailDate.DayOfWeek != DayOfWeek.Sunday)

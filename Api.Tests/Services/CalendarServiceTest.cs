@@ -34,6 +34,7 @@ namespace Api.Services.Tests
         [InlineData("2021-01-11", "2021-01-27", 11)]    // multi weekend span
         [InlineData("2020-01-01", "2021-01-01", 261)]   // full year
         [InlineData("2015-01-01", "2021-01-01", 1565)]  // 5 years+
+        [InlineData("2010-01-01", "2021-01-01", 2869)]  // 10 years+
         [InlineData("2020-12-30", "2021-01-01", 1)]     // NYE shenanigans
         public void GetBusinessDaysBetweenDatesAccountsForWeekends(string start, string end, int expectedResult)
         {
@@ -89,6 +90,7 @@ namespace Api.Services.Tests
             Assert.Equal(expectedResult, fastResult);
         }
 
+
         [Theory]
         [InlineData("0100-01-01", "9999-12-31")]     // quite a while
         public void GetBusinessDaysPerformanceComparison(string start, string end)
@@ -112,6 +114,37 @@ namespace Api.Services.Tests
             var fastTime = fastStopwatch.ElapsedMilliseconds;
 
             Assert.True(fastTime < slowTime);
+        }
+
+        /*
+         * Catch-all test of last resort to detect edge cases across large and complex calculations by comparing normal and fast calcs
+         */
+        [Fact]
+        public void LongRangeConsistencyCheck()
+        {
+            DateTime startDate = DateTime.Parse("0001-01-01");
+            DateTime endDate = DateTime.Parse("9999-12-31");
+            
+            List<IHolidayService> services = new List<IHolidayService>();
+            List<IHoliday> holidays = new List<IHoliday>();
+
+            holidays.Add(new AnnualHoliday { Name = "Annual", Month = 1, Date = 26 });
+            holidays.Add(new AnnualHoliday { Name = "Rollover Annual", Month = 12, Date = 25 });
+
+            holidays.Add(new RuleHoliday { Name = "Rule", Month = 6, Date = 1, DayOfWeek = (int) DayOfWeek.Monday, Occurence = 2 });
+
+            holidays.Add(new AdHocHoliday { Name = "Weekend Adhoc", Year = 2021, Month = 7, Date = 2 });
+            holidays.Add(new AdHocHoliday { Name = "Weekday Adhoc", Year = 2021, Month = 7, Date = 3 });
+
+            var holidayServiceMock = new Mock<IHolidayService>();
+            holidayServiceMock.Setup(s => s.GetHolidays(It.IsAny<int>())).Returns(holidays);
+            services.Add(holidayServiceMock.Object);
+
+            var calendarService = new CalendarService(services);
+            var result = calendarService.GetBusinessDaysBetweenDates(startDate, endDate);
+            var fastResult = calendarService.FastBusinessDaysBetweenDates(startDate, endDate);
+
+            Assert.Equal(fastResult, result);
         }
         
     }
